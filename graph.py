@@ -3,6 +3,7 @@ import numpy as np
 import networkx as nx
 import scipy.optimize
 import pulp
+from matplotlib import pyplot as plt
 
 nodes = list(range(15))
 SNI_nodes = set([3, 8, 10, ]) # and 13
@@ -71,16 +72,14 @@ def opt_setup(g):
                 if g.nodes.data()[dest].get('OUT'):
                     for i, path in enumerate(all_paths[(src, dest)]):
                         prob += sum(ecuts[e_ids[edge]] for edge in path) >= 1, "pass-through path {} from {} to {}".format(i, src, dest)
-
-
-    # TODO: add SNI: cut all in-out paths
     #prob.writeLP('aes.lp')
+    print('Starting optimization...')
     prob.solve()
     print("Status:", pulp.LpStatus[prob.status])
-    print("Cut edges:", [edges[i] for i, e in ecuts.items() if pulp.value(e) == 1.0])
+    cut_edges = [edges[i] for i, e in ecuts.items() if pulp.value(e) == 1.0]
+    print("Cut edges:", cut_edges)
+    return cut_edges
     #print("Res:", [(edges[i], pulp.value(e)) for i, e in ecuts.items()])
-
-
 
 def simplify_node(g, node):
     """If node has only:
@@ -110,8 +109,15 @@ def simplify_graph(g):
     simplifies = True
     while simplifies:
         simplifies = False
-        for node in reversed(list(nx.topological_sort(g))):
-            simplifies = simplifies or simplify_node(g, node)
+        try:
+            for node in reversed(list(nx.topological_sort(g))):
+                simplifies = simplifies or simplify_node(g, node)
+        except nx.NetworkXUnfeasible:
+            pos=nx.nx_agraph.graphviz_layout(g, prog='dot')
+            nx.draw(g, pos, with_labels=True, arrows=True)
+            break
+
+
 
 def test_graph_NI(g):
     paths = compute_paths(g)
@@ -127,6 +133,11 @@ def test_graph_SNI(g):
                         return False
     return all(len(l) <= 1 for src, p in paths.items() for _, l in p.items())
 
+def show_cut_graph(g, cut):
+    pos=nx.nx_agraph.graphviz_layout(g, prog='dot')
+    nx.draw(g, pos, with_labels=True, arrows=True)
+    nx.draw_networkx_edges(g, pos, edgelist=cut, edge_color='r')
+
 def test():
     #cut_SNI(gaes)
     simplify_graph(gaes)
@@ -139,7 +150,9 @@ def test():
     print('SNI:', test_graph_SNI(gaes))
     print('edges', gaes.edges)
     #print('flat_paths', flat_paths(gaes))
-    opt_setup(gaes)
+    cut = opt_setup(gaes)
+    show_cut_graph(gaes, cut)
+    plt.show()
 
 if __name__ == '__main__':
     test()
