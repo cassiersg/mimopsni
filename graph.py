@@ -30,18 +30,6 @@ def cut_SNI(g):
             for e in list(g.out_edges(node, keys=True)):
                 g.remove_edge(*e)
 
-def compute_paths(g):
-    paths_nodes = {}
-    for node in reversed(list(nx.topological_sort(g))):
-        paths = {}
-        for _, succ, e_id in g.out_edges(node, keys=True):
-            for dest, sub_paths in paths_nodes[succ].items():
-                for sub_path in sub_paths:
-                    paths.setdefault(dest, list()).append([(node, succ, e_id)]+sub_path)
-            paths.setdefault(succ, list()).append([(node, succ, e_id)])
-        paths_nodes[node] = paths
-    return paths_nodes
-
 def flat_paths(g):
     paths = compute_paths(g)
     return {(src, dst): paths
@@ -70,7 +58,7 @@ def opt_setup(g):
         if g.nodes.data()[src].get('IN'):
             for dest in g.nodes:
                 if g.nodes.data()[dest].get('OUT'):
-                    for i, path in enumerate(all_paths[(src, dest)]):
+                    for i, path in enumerate(all_paths.get((src, dest), [])):
                         prob += sum(ecuts[e_ids[edge]] for edge in path) >= 1, "pass-through path {} from {} to {}".format(i, src, dest)
     #prob.writeLP('aes.lp')
     print('Starting optimization...')
@@ -132,11 +120,6 @@ def test_graph_SNI(g):
                     if paths.get(src, {}).get(dest, []):
                         return False
     return all(len(l) <= 1 for src, p in paths.items() for _, l in p.items())
-
-def show_cut_graph(g, cut):
-    pos=nx.nx_agraph.graphviz_layout(g, prog='dot')
-    nx.draw(g, pos, with_labels=True, arrows=True)
-    nx.draw_networkx_edges(g, pos, edgelist=cut, edge_color='r')
 
 def test():
     #cut_SNI(gaes)
