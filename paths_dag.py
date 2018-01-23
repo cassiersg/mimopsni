@@ -127,8 +127,8 @@ def is_graph_NI(g):
 
 def is_graph_SNI(g):
     paths = compute_paths(g)
-    in_nodes = filter(g.nodes, lambda src: g.nodes.data()[src].get('IN'))
-    out_nodes = filter(g.nodes, lambda src: g.nodes.data()[src].get('OUT'))
+    in_nodes = filter(lambda src: g.nodes.data()[src].get('IN'), g.nodes)
+    out_nodes = filter(lambda src: g.nodes.data()[src].get('OUT'), g.nodes)
     for src in in_nodes:
         for dest in out_nodes:
             if paths.get(src, {}).get(dest, []):
