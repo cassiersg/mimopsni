@@ -56,45 +56,11 @@ def compute_paths(g):
                 paths_all.setdefault(node, dict())[dest] = _inline_paths(node, dest, paths_dest, paths_all, g)
     return paths_all
 
-def flat_paths(g):
-    return flatten_paths(compute_paths(g))
-
-def flatten_paths(all_paths):
-    return {(src, dst): paths
-            for src, p in all_paths.items()
-            for dst, paths in p.items()
-            }
-
-def _path_expand(p, all_paths):
-    elems_expanded = [all_paths[src][dest] if e_id is None else [[(src, dest, e_id)]]
-                      for src, dest, e_id in p]
-    return [sum(x, []) for x in itertools.product(*elems_expanded)]
-
-def expand_compressed_paths(g, all_paths):
-    for n in reversed(list(nx.topological_sort(g))):
-        all_paths.setdefault(n, dict())
-        for d in nx.topological_sort(g):
-            if d in all_paths[n]:
-                t_res = []
-                for x in all_paths[n][d]:
-                    t_res += _path_expand(x, all_paths)
-                all_paths[n][d] = t_res
-    return all_paths
-
-def expanded_path_to_comparable(all_paths):
-    for n in all_paths:
-        for d in all_paths[n]:
-            all_paths[n][d] = set(map(tuple, all_paths[n][d]))
-    return all_paths
-
-def n_paths(all_paths):
-    return sum(len(x) for x in flatten_paths(all_paths).values())
-
-def test_graph_NI(g):
+def is_graph_NI(g):
     paths = compute_paths(g)
     return all(len(l) <= 1 for src, p in paths.items() for _, l in p.items())
 
-def test_graph_SNI(g):
+def is_graph_SNI(g):
     paths = compute_paths(g)
     for src in g.nodes:
         if g.nodes.data()[src].get('IN'):
@@ -136,9 +102,6 @@ def _test_paths():
                      5: {6: [[(5, 6, 0)]]}})
     print('all _test_paths test succeded')
 
-    #print('########################################')
-    #nodes = list(range(8))
-    #edges = [(0, 1), (1, 2), (1, 3), (2, 4), (3, 4), (4, 5), (5, 6), (1, 4), (3, 7), (7, 5)]
     nodes = list(range(6))
     edges = [(0, 1), (1, 2), (1, 3), (2, 4), (3, 4), (4, 5)]
     g = nx.MultiDiGraph()
