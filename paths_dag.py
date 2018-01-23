@@ -122,18 +122,37 @@ def compute_paths(g):
     return all_paths
 
 def is_graph_NI(g):
-    paths = compute_paths(g)
-    return all(len(l) <= 1 for src, p in paths.items() for _, l in p.items())
+    desc = {}
+    return True
+    for n in reversed(list(nx.topological_sort(g))):
+        desc.setdefault(n, set())
+        for n2 in g.successors(n):
+            if n2 in desc[n]:
+                return False
+            desc[n] |= set([n2])
+            if desc[n] & desc[n2]:
+                return False
+            desc[n] |= desc[n2]
+    return True
 
 def is_graph_SNI(g):
-    paths = compute_paths(g)
-    in_nodes = filter(lambda src: g.nodes.data()[src].get('IN'), g.nodes)
-    out_nodes = filter(lambda src: g.nodes.data()[src].get('OUT'), g.nodes)
-    for src in in_nodes:
-        for dest in out_nodes:
-            if paths.get(src, {}).get(dest, []):
+    desc = {}
+    for n in reversed(list(nx.topological_sort(g))):
+        desc.setdefault(n, set())
+        for n2 in g.successors(n):
+            if n2 in desc[n]:
                 return False
-    return is_graph_NI(g)
+            desc[n] |= set([n2])
+            if desc[n] & desc[n2]:
+                return False
+            desc[n] |= desc[n2]
+    paths = compute_paths(g)
+    in_nodes = list(filter(lambda src: g.nodes.data()[src].get('IN'), g.nodes))
+    out_nodes = set(filter(lambda src: g.nodes.data()[src].get('OUT'), g.nodes))
+    for n in in_nodes:
+        if desc[n] & out_nodes:
+            return False
+    return True
 
 def _test_paths_comp(nodes, edges, res):
     g = nx.MultiDiGraph()
