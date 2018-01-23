@@ -69,4 +69,21 @@ def add_split_nodes(g):
             split_n[n] = l
     return split_n
 
+def without_unncessary_splits(g, cut_edges, split_c_d):
+    """Generates a graph without unncessary split nodes.
+
+    * graph g
+    * cut_edges edges cut by algo
+    * split_c_d dict {node: [associated split nodes]
+    """
+    g = copy.deepcopy(g)
+    g2 = without_edges(g, cut_edges)
+    for n, sg in split_c_d.items():
+        for s in sg:
+            if g2.out_degree(s) == 0:
+                g.remove_node(s)
+            elif g2.out_degree(s) == 1:
+                g.add_edge(n, next(g2.successors(s)))
+                g.remove_node(s)
+    return g
 
