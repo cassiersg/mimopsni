@@ -13,20 +13,20 @@ def draw_graph(g, cut=tuple()):
     g = nx.relabel_nodes(g, mapping)
     pos=nx.nx_agraph.graphviz_layout(g, prog='dot')
     n_colors = [n_color(g, n) for n in g]
-    el = list(g.edges)
+    el = set(g.edges)
     nx.draw(
         g,
         pos,
         with_labels=True,
         arrows=True,
-        edgelist=el,
+        edgelist=list(el - set(cut)),
         node_color=n_colors,
         node_size=600)
     if cut:
         nx.draw_networkx_edges(
             g,
             pos,
-            edgelist=list(set(el) & set(cut)),
+            edgelist=list(el & set(cut)),
             edge_color='r',
             arrows=True)
 

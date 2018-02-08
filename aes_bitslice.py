@@ -22,7 +22,8 @@ split_c_d = graph_tools.add_split_nodes(g)
 split_c = list(split_c_d.values())
 print('baseline cut', sum(len(x)*(len(x)-1) for x in split_c))
 
-cut_edges = opt_sni.opt_sni(g, split_c, max_seconds=20)
+cut_edges = opt_sni.opt_sni(g, split_c, max_seconds=4*60*15)
+
 g2 = graph_tools.without_edges(g, cut_edges)
 
 print('Cut is NI', paths_dag.is_graph_NI(g2))
@@ -36,7 +37,7 @@ print('Cut is SNI', paths_dag.is_graph_SNI(g2))
 #draw_graph(g3, cut_edges2)
 #plt.show()
 
-g4 = graph_tools.without_unncessary_splits(g, cut_edges, split_c_d)
-draw_graph(g4, [x for x in cut_edges if x in g4.edges])
+g4, simplified_cut_edges = graph_tools.without_unncessary_splits(g, cut_edges, split_c_d)
+draw_graph(g4, simplified_cut_edges)
 plt.show()
 

@@ -74,16 +74,28 @@ def without_unncessary_splits(g, cut_edges, split_c_d):
 
     * graph g
     * cut_edges edges cut by algo
-    * split_c_d dict {node: [associated split nodes]
+    * split_c_d dict {node: [associated split nodes]}
     """
     g = copy.deepcopy(g)
     g2 = without_edges(g, cut_edges)
+    new_cut_edges = []
     for n, sg in split_c_d.items():
+        for dest in list(g.successors(sg[0])):
+            if n == 't43':
+                print('dest', dest, list(g2.predecessors(dest)))
+            if all((s, dest, 0) in cut_edges for s in sg):
+                if n == 't43':
+                    print('dest taken', dest)
+                g.add_edge(n, dest)
+                new_cut_edges.append((n, dest, 0))
+            for s in sg:
+                if (s, dest, 0) in cut_edges:
+                    g.remove_edge(s, dest)
         for s in sg:
             if g2.out_degree(s) == 0:
                 g.remove_node(s)
             elif g2.out_degree(s) == 1:
                 g.add_edge(n, next(g2.successors(s)))
                 g.remove_node(s)
-    return g
+    return g, list(set(cut_edges) & set(g.edges)) + new_cut_edges
 

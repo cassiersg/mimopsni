@@ -51,6 +51,10 @@ def find_efficient_ni(threshold=3, kind='SNI'):
     return [comb for comb in binary_combinations(threshold, len(edges))
             if test_ni_cut(comb, kind)]
 
+def wrap_result_lin(x):
+    x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15 = x
+    return (x0, x1, x2+x3, x4, x5, x6, x7, x8+x9, x10, x11, x12+x13, x14, x15)
+
 def test():
     g = nx.MultiDiGraph()
     g.add_nodes_from(nodes)
@@ -61,4 +65,5 @@ def test():
 if __name__ == '__main__':
     #test()
     from pprint import pprint
-    pprint([list(map(int, x)) for x in find_efficient_ni(3, 'SNI')])
+    #pprint([list(map(int, x)) for x in find_efficient_ni(3, 'SNI')])
+    pprint(set(wrap_result_lin(list(map(int, x))) for x in find_efficient_ni(3, 'SNI')))
