@@ -92,9 +92,13 @@ exp = (
 s_in = open('repr_aes_bitslice/lin_in.txt').read()
 s_out = open('repr_aes_bitslice/lin_out_not.txt').read()
 s_out = s_out.replace('z', 'o')
-print('lin in')
-print(s_in)
-print('non lin')
-print('\n'.join(exp))
-print('lin out')
-print(s_out)
+s = (
+        'lin in\n' +
+        '\n'.join(sorted(s_in.splitlines())) + '\n' +
+        'non lin\n' +
+        '\n'.join(exp) + '\n' +
+        'lin out\n' +
+        '\n'.join(sorted(s_out.splitlines())) + '\n'
+        )
+print(s)
+
