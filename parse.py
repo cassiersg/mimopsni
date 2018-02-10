@@ -3,7 +3,7 @@ import networkx as nx
 
 from utils import flatten
 
-def _parse_assignment(assignment):
+def parse_assignment(assignment):
     dst, expr = assignment.split('=')
     expr_n = expr.replace('*', '+')
     src1, src2 = expr_n.split('+')
@@ -22,7 +22,7 @@ def parse_string_graph(s):
     node if variable appears in the LHS of an assignment. Two input edge for each
     assigned variable coming from operands.
     """
-    l = [_parse_assignment(x) for x in s.splitlines()]
+    l = [parse_assignment(x) for x in s.splitlines()]
     nodes = set(flatten((dst, *srcs) for dst, op, srcs in l))
     edges = list(flatten(
         ((src1, dst), (src2, dst)) for dst, op, (src1, src2) in l

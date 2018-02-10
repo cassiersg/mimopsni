@@ -69,8 +69,8 @@ def add_split_nodes(g):
             split_n[n] = l
     return split_n
 
-def without_unncessary_splits(g, cut_edges, split_c_d):
-    """Generates a graph without unncessary split nodes.
+def remove_exceeding_split_edges(g, cut_edges, split_c_d):
+    """Generates a graph without unncessary split edges.
 
     * graph g
     * cut_edges edges cut by algo
@@ -78,24 +78,38 @@ def without_unncessary_splits(g, cut_edges, split_c_d):
     """
     g = copy.deepcopy(g)
     g2 = without_edges(g, cut_edges)
+    for n, sg in split_c_d.items():
+        sg = list(sg)
+        for dest in list(g.successors(sg[0])):
+            if all((s, dest, 0) in cut_edges for s in sg):
+                for s in sg[1:]:
+                    g.remove_edge(s, dest)
+            else:
+                for s in sg:
+                    if (s, dest, 0) in cut_edges:
+                        g.remove_edge(s, dest)
+    return g, list(set(cut_edges) & set(g.edges))
+
+def without_unncessary_splits(g, cut_edges, split_c_d):
+    """Generates a graph without unncessary split nodes.
+
+    * graph g
+    * cut_edges edges cut by algo
+    * split_c_d dict {node: [associated split nodes]}
+    """
+    g, cut_edges = remove_exceeding_split_edges(g, cut_edges, split_c_d)
     new_cut_edges = []
     for n, sg in split_c_d.items():
-        for dest in list(g.successors(sg[0])):
-            if n == 't43':
-                print('dest', dest, list(g2.predecessors(dest)))
-            if all((s, dest, 0) in cut_edges for s in sg):
-                if n == 't43':
-                    print('dest taken', dest)
-                g.add_edge(n, dest)
-                new_cut_edges.append((n, dest, 0))
-            for s in sg:
-                if (s, dest, 0) in cut_edges:
-                    g.remove_edge(s, dest)
         for s in sg:
-            if g2.out_degree(s) == 0:
+            if g.out_degree(s) == 0:
                 g.remove_node(s)
-            elif g2.out_degree(s) == 1:
-                g.add_edge(n, next(g2.successors(s)))
+            elif g.out_degree(s) == 1:
+                n2 = next(g.successors(s))
+                if (n, s, 0) in cut_edges and (s, n2, 0) in cut_edges:
+                    raise ValueError(n, s, n2)
+                if (s, n2, 0) in cut_edges or (n, s, 0) in cut_edges:
+                    new_cut_edges.append((n, n2, 0))
+                g.add_edge(n, n2)
                 g.remove_node(s)
     return g, list(set(cut_edges) & set(g.edges)) + new_cut_edges
 
