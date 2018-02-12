@@ -1,5 +1,6 @@
+#! /usr/bin/python3
 
-from math import log2
+from math import log2, ceil
 from pprint import pprint
 
 def ni_mul(d):
@@ -12,15 +13,37 @@ def sni_mul(d):
 
 def sni_ref(d):
     """Batistello"""
-    return int((d+1)*log2(d+1))
+    return sni_ref_rec(d+1)
+
+def sni_ref_rec(n):
+    if n == 1:
+        return 0
+    elif n == 2:
+        return 1
+    else:
+        return 2*(n//2) + sni_ref_rec(n//2) + sni_ref_rec(int(ceil(n/2)))
+
+def test_sni_ref():
+    """Compare general recursive function with formula computed by hand for powers of 2"""
+    for i in range(1, 10):
+        d = 2**i-1
+        a = sni_ref(d)
+        b = int((d+1)*(log2(d+1)-1)+(d+1)/2)
+        assert a==b, (d, a, b)
 
 def pini_mul(d):
-    """PINI mul"""
+    """PINI mul, randomness identical to ISW"""
     return sni_mul(d)
 
-comp_better_isw = next(d for d in range(1, 100) if ni_mul(d) + sni_ref(d) <= sni_mul(d))
-print('min d for which (ni mul + sni ref) better than ISW:', comp_better_isw)
+# test
+test_sni_ref()
 
-print('d for which pini is better than mimo-sni')
-pprint([d for d in range(1, 100) if 32*pini_mul(d) <= min(41*sni_ref(d)+32*ni_mul(d), (41-32)*sni_ref(d) + 32*sni_mul(d))])
+comp_better_isw = next(d for d in range(1, 100) if ni_mul(d) + sni_ref(d) <= sni_mul(d))
+print('miniumum d for which (ni mul + sni ref) better than ISW:', comp_better_isw)
+
+print('all d for which pini is better than mimo-sni (considering only ISW, Belaid and Batistello gadgets, for optimized S-Box with 41 refresh elements:',
+        [d for d in range(1, 100) if 32*pini_mul(d) <= min(41*sni_ref(d)+32*ni_mul(d), (41-32)*sni_ref(d) + 32*sni_mul(d))])
+
+print('Battistello refresh (d, cost):')
+pprint([(d, sni_ref(d)) for d in range(1, 30)])
 
