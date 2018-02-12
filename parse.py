@@ -1,4 +1,8 @@
 
+"""
+Parsing text representation of computation graphs.
+"""
+
 import networkx as nx
 
 from utils import flatten

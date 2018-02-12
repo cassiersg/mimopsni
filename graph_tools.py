@@ -1,4 +1,6 @@
 
+"""Utilities for other modules"""
+
 import copy
 import re
 import networkx as nx

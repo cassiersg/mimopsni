@@ -1,13 +1,13 @@
+#! /usr/bin/python3
 
-import logging
-logging.basicConfig(level=logging.DEBUG)
+"""
+Export AES S-Box computation graph with cut edges to a LaTeX representation.
+"""
+
 import re
 
 import networkx as nx
-import matplotlib.pyplot as plt
 
-import paths_dag
-import opt_sni
 import parse
 import graph_tools
 

@@ -1,3 +1,8 @@
+#! /usr/bin/python3
+
+"""
+Optimize number of refreshes in bitslice implementation of Fantomas
+"""
 
 import logging
 logging.basicConfig(level=logging.DEBUG)

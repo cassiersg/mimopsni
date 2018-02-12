@@ -1,5 +1,10 @@
 #! /usr/bin/python3
 
+"""
+Comparison of cost of implementation of bitslice AES using generic
+multiplication and refresh gadgets, as a function of the security order.
+"""
+
 from math import log2, ceil
 from pprint import pprint
 

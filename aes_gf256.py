@@ -1,3 +1,8 @@
+#! /usr/bin/python3
+
+"""
+Find optimal set of refresh for implementation of AES inversion in GF(256).
+"""
 
 import itertools as it
 
@@ -7,7 +12,7 @@ from matplotlib import pyplot as plt
 import paths_dag
 import utils
 
-# See figure 6 in "Randomness Complexity of Private Circuits for Multiplication"
+# See figure 6 in "Randomness Complexity of Private Circuits for Multiplication, Belaid et al., Eurocrypt 2016"
 nodes = ['i', 'is', 'a9', 'a9s', 'a7', 'a7s', 'a6', 'a6s', 'a4', 'a3', 'a2', 'a1', 'o']
 edges = [
     ('i', 'is'), ('is', 'a7'), ('is', 'a9'),
@@ -52,6 +57,7 @@ def find_efficient_ni(threshold=3, kind='SNI'):
             if test_ni_cut(comb, kind)]
 
 def wrap_result_lin(x):
+    """Remove redundancies (ie. edges before and after 2^j power gadgets)"""
     x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15 = x
     return (x0, x1, x2+x3, x4, x5, x6, x7, x8+x9, x10, x11, x12+x13, x14, x15)
 
@@ -65,5 +71,4 @@ def test():
 if __name__ == '__main__':
     #test()
     from pprint import pprint
-    #pprint([list(map(int, x)) for x in find_efficient_ni(3, 'SNI')])
     pprint(set(wrap_result_lin(list(map(int, x))) for x in find_efficient_ni(3, 'SNI')))

@@ -1,4 +1,8 @@
 
+"""
+Utilitary functions.
+"""
+
 import re
 
 import networkx as nx

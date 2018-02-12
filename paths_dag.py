@@ -1,4 +1,9 @@
 
+"""
+Computations of all paths in a DAG (expressed in compressed "cluster" form).
+See docstring of compute_paths.
+"""
+
 import networkx as nx
 import itertools
 
