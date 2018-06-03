@@ -143,27 +143,14 @@ import matplotlib.pyplot as plt
 ds = list(range(1, 32))
 x = [d+1 for d in ds]
 y = np.array([[
-    #d+1,
-    s_box_greedy(d),
-    s_box_mimo(d),
-    s_box_pini(d),
-    #s_box_pini2(d)
-    ] for d in ds])
-plt.semilogy(x, y, '.-')
-plt.legend(['Greedy strategy', 'MIMO-SNI', 'PINI',])
-plt.xlabel('Order $d$')
-plt.ylabel('Randomness cost (bits)')
-#matplotlib2tikz.save('../SNI_opt/figs/rand_cost.tex', figureheight='\\figureheight', figurewidth='\\figurewidth')
-plt.show()
-y2 = np.array([[
     1,
     s_box_mimo(d)/ s_box_greedy(d),
     s_box_pini(d)/ s_box_greedy(d),
+    s_box_pini2(d) / s_box_greedy(d),
     ] for d in ds])
-plt.plot(x, y2, '.-')
-plt.legend(['Greedy strategy', 'MIMO-SNI', 'PINI',])
+plt.plot(x, y, '.-')
+plt.legend(['Greedy strategy', 'MIMO-SNI', 'PINI1', 'PINI2'])
 plt.xlabel('Order $d$')
 plt.ylabel('Relative randomness cost')
-#matplotlib2tikz.save('../SNI_opt/figs/rand_cost_rel.tex', figureheight='\\figureheight', figurewidth='\\figurewidth')
 plt.show()
 

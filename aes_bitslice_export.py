@@ -150,9 +150,9 @@ exp = list(export_graph(g4, simplified_cut_edges, split_c_d))
 exp = sort_assign(f'${x}$ \\\\' for x in exp)
 exp_old = exp
 exp = (
-        [x for x in exp if x.startswith('$x')] + 
-        [x for x in exp if x.startswith('$y')] + 
-        [x for x in exp if x.startswith('$t')] + 
+        [x for x in exp if x.startswith('$x')] +
+        [x for x in exp if x.startswith('$y')] +
+        [x for x in exp if x.startswith('$t')] +
         [x for x in exp if x.startswith('$z')] +
         [x for x in exp if x.startswith('$o')]
         )
@@ -160,22 +160,22 @@ s_in = open('repr_aes_bitslice/lin_in.txt').read()
 s_out = open('repr_aes_bitslice/lin_out_not.txt').read()
 s_out = s_out.replace('z', 'o')
 exp_out = sort_assign(map(format_assign, s_out.splitlines()))
-exp_out = ( 
-        [x for x in exp_out if x.startswith('$t')] + 
-        [x for x in exp_out if x.startswith('$s')] 
+exp_out = (
+        [x for x in exp_out if x.startswith('$t')] +
+        [x for x in exp_out if x.startswith('$s')]
         )
 s = (
-        '\\begin{multicols}{4}\n' +
+        '\\begin{multicols}{5}\n' +
         '[Top linear layer\n]\n' +
         r'\noindent' +
         '\n'.join(sort_assign(map(format_assign, s_in.splitlines()))) + '\n' +
         '\\end{multicols}\n\n' +
-        '\\begin{multicols}{4}\n' +
+        '\\begin{multicols}{5}\n' +
         '[Middle non-linear layer\n]\n' +
         r'\noindent' +
         '\n'.join(exp) + '\n' +
         '\\end{multicols}\n\n' +
-        '\\begin{multicols}{4}\n' +
+        '\\begin{multicols}{5}\n' +
         '[Bottom linear layer\n]\n' +
         r'\noindent' +
         '\n'.join(exp_out) + '\n' +
