@@ -1,4 +1,18 @@
+# Copyright 2018 Gaëtan Cassiers
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
+import math
 import random
 
 import circuit_model
@@ -10,7 +24,7 @@ def simple_ref(circuit, inputs, outputs=None, out_name='sr'):
     c = circuit
     r = [c.var(f'r_{i}', kind='random') for i in range(d-1)]
     if d == 1:
-        c.bij(outputs[0], inputs[0])
+        c.assign(outputs[0], inputs[0])
     elif d == 2:
         c.l_sum(outputs[0], (inputs[0], r[0]))
         c.l_sum(outputs[1], (inputs[1], r[0]))
@@ -31,8 +45,8 @@ def isw_ref(circuit, inputs, outputs=None, out_name=''):
     c = [[circuit.var(f'c_{i}_{j}') for j in range(d)] for i in range(d)]
     r = [{j: circuit.var(f'r_{i}_{j}', kind='random') for j in range(i)} for i in range(d)]
     for i in range(d):
-        circuit.bij(c[i][0], inputs[i])
-        circuit.bij(outputs[i], c[i][d-1])
+        circuit.assign(c[i][0], inputs[i])
+        circuit.assign(outputs[i], c[i][d-1])
     for i in range(d):
         for j in range(i):
             circuit.l_sum(c[i][j+1], (c[i][j], r[i][j]))
@@ -46,14 +60,14 @@ def bat_ref_layer(circuit, inputs, outputs, d, d2):
         circuit.l_sum(outputs[i], (inputs[i], r[i]))
         circuit.l_sum(outputs[d2+i], (inputs[d2+i], r[i]))
     if d % 2 == 1:
-        circuit.bij(outputs[d-1], inputs[d-1])
+        circuit.assign(outputs[d-1], inputs[d-1])
 
 def bat_ref(circuit, inputs, outputs=None, out_name=''):
     d = len(inputs)
     if outputs is None:
-        outputs = [circuit.var(f'{out_name}_{i}') for i in range(d)]
+        outputs = [circuit.var(f'batref_{out_name}_{i}') for i in range(d)]
     if d == 1:
-        circuit.bij(outputs[0], inputs[0])
+        circuit.assign(outputs[0], inputs[0])
     elif d == 2:
         r = circuit.var('r', kind='random')
         circuit.l_sum(outputs[0], (inputs[0], r))
@@ -73,7 +87,7 @@ def half_ref(circuit, inputs, outputs=None, out_name=''):
     if outputs is None:
         outputs = [circuit.var(f'{out_name}_{i}') for i in range(d)]
     if d == 1:
-        circuit.bij(outputs[0], inputs[0])
+        circuit.assign(outputs[0], inputs[0])
     else:
         d2 = d//2
         bat_ref_layer(circuit, inputs, outputs, d, d2)
@@ -84,7 +98,7 @@ def half1_ref(circuit, inputs, outputs=None, out_name=''):
     if outputs is None:
         outputs = [circuit.var(f'{out_name}_{i}') for i in range(d)]
     if d == 1:
-        circuit.bij(outputs[0], inputs[0])
+        circuit.assign(outputs[0], inputs[0])
     else:
         d2 = d//2
         if d % 2 == 1:
@@ -104,7 +118,7 @@ def rot_ref(circuit, inputs, outputs=None, out_name=''):
     if outputs is None:
         outputs = [circuit.var(f'{out_name}_{i}') for i in range(d)]
     if d == 1:
-        circuit.bij(outputs[0], inputs[0])
+        circuit.assign(outputs[0], inputs[0])
     else:
         randoms = [circuit.var(f'r_{i}', kind='random') for i in range(d)]
         temps = [circuit.var(f'temp_{i}') for i in range(d)]
@@ -125,7 +139,9 @@ def barthe_sni_n_rounds(n_shares):
     elif n_shares in (5, 6, 7): return 2
     elif n_shares in (8, 9, 10): return 3
     elif n_shares == 11: return 4
-    else: raise ValueError('not SNI')
+    else:
+        return math.ceil((n_shares-1)/3) # only conjectured to be SNI
+        #raise ValueError('not SNI')
 
 def barthe_ref(circuit, inputs, outputs=None, out_name=''):
     n_rounds = barthe_sni_n_rounds(len(inputs))
@@ -142,13 +158,13 @@ def bij_ref(circuit, inputs, outputs=None, out_name='sr'):
     if outputs is None:
         outputs = [circuit.var(f'{out_name}_{i}') for i in range(d)]
     for i, o in zip(inputs, outputs):
-        circuit.bij(o, i)
+        circuit.assign(o, i)
     return outputs
 
 
 refs = {
         'simple_ref': simple_ref,
-        'isw_ref': isw_ref,
+        'SNI_ref': isw_ref,
         'bat_ref': bat_ref,
         'half_ref': half_ref,
         'half1_ref': half1_ref,

@@ -28,30 +28,26 @@ x = [d+1 for d in ds]
 y = []
 for d in ds:
     cmimo = runtime_costs.cost_mimo(d)
-    cgreedy = runtime_costs.cost_greedy(d)
+    #cgreedy = runtime_costs.cost_greedy(d)
     cpini1 = runtime_costs.cost_pini1_sbox(d)
     cpini2 = runtime_costs.cost_pini2_sbox(d)
-    ctight = runtime_costs.cost_tight(d)
     y.append([
         1,
-        cmimo/cgreedy,
-        #ctight/cgreedy,
-        cpini1/cgreedy,
-        cpini2/cgreedy,
+        cpini1/cmimo,
+        cpini2/cmimo,
         ])
 y = np.array(y)
 plt.plot(x, y, '.-', markersize=1)
 plt.legend([
-    'Greedy strategy',
     'MIMO-SNI',
-    '\\pinia',
-    '\\pinib',
+    'PINI1',
+    'PINI2',
     ])
 plt.xlabel('Order $d$')
 plt.ylabel('Relative runtime cost')
 
-matplotlib2tikz.save('../dissertation/figs1/runtime_cost_rel.tex',
-        figureheight='\\figureheight', figurewidth='\\figurewidth',
-        externalize_tables=True, override_externals=True,
-        tex_relative_path_to_data='figs1')
+#matplotlib2tikz.save('../dissertation/figs1/runtime_cost_rel.tex',
+#        figureheight='\\figureheight', figurewidth='\\figurewidth',
+#        externalize_tables=True, override_externals=True,
+#        tex_relative_path_to_data='figs1')
 plt.show()
