@@ -170,9 +170,6 @@ class Circuit:
     def nb_ops(self):
         return len(self.l_sums) + len(self.l_prods)
 
-    def cost(self, cost_random, cost_op):
-        return self.nb_randoms()*cost_random + self.nb_ops()*cost_op
-
 
 class Variable:
     def __init__(self, name, idx, continuous, kind):
