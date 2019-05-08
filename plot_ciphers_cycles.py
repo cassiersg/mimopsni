@@ -202,6 +202,11 @@ ciphers = [
 
 ds = list(range(2, 33))
 
+tikz = False
+#tikz = True
+if tikz:
+    import matplotlib2tikz
+
 for c_name, cipher, m_methods in ciphers:
     cycles = [[m(cipher, d).compress(*costs) for d in ds] for _, m in m_methods]
     plt.figure()
@@ -212,18 +217,14 @@ for c_name, cipher, m_methods in ciphers:
     plt.ylabel('Cost')
     plt.title(c_name)
 
-
-tikz = False 
-#tikz = True
-if tikz:
-    import matplotlib2tikz
-    matplotlib2tikz.save(
-            '../SNI_opt/v2/figs/run_cost.tex',
-            figureheight='\\figureheight',
-            figurewidth='\\figurewidth',
-            externalize_tables=True,
-            override_externals=True,
-            tex_relative_path_to_data='figs',
-            )
+    if tikz:
+        matplotlib2tikz.save(
+                '../SNI_opt/v2/figs/{}_cost.tex'.format(c_name.lower().replace('-', '_')),
+                figureheight='\\figureheight',
+                figurewidth='\\figurewidth',
+                externalize_tables=True,
+                override_externals=True,
+                tex_relative_path_to_data='figs',
+                )
 
 plt.show()

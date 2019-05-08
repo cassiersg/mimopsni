@@ -19,7 +19,7 @@ Optimize number of refreshes in bitslice implementation of Fantomas
 """
 
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -45,7 +45,7 @@ print('baseline cut', sum(len(x)*(len(x)-1) for x in split_c))
 draw_graph(g)
 plt.show()
 
-cut_edges = opt_sni.opt_sni(g, split_c, max_seconds=60)
+cut_edges = opt_sni.opt_sni(g, split_c, max_seconds=10)
 g2 = graph_tools.without_edges(g, cut_edges)
 
 print('Cut is NI', paths_dag.is_graph_NI(g2))
@@ -59,7 +59,7 @@ cut_edges2 = [x for x in cut_edges if x in g3.edges]
 draw_graph(g3, cut_edges2)
 plt.show()
 
-g4 = graph_tools.without_unncessary_splits(g, cut_edges, split_c_d)
+g4, ce = graph_tools.without_unncessary_splits(g, cut_edges, split_c_d)
 draw_graph(g4, [x for x in cut_edges if x in g4.edges])
 plt.show()
 draw_graph(g, cut_edges)

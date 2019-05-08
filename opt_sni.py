@@ -98,8 +98,8 @@ def opt_sni(g, split_c=tuple(), indep_bits=True, max_seconds=4*60):
             prob += sum(p_cuts2dest) >= len(p_cuts2dest) - 1
 
     print('Starting optimization...')
-    #prob.solve(pulp.PULP_CBC_CMD(msg=1, threads=4, maxSeconds=max_seconds))
-    prob.solve(pulp.solvers.CPLEX(msg=1, timeLimit=max_seconds))
+    prob.solve(pulp.PULP_CBC_CMD(msg=1, threads=4, maxSeconds=max_seconds))
+    #prob.solve(pulp.solvers.CPLEX(msg=1, timeLimit=max_seconds))
     for v in prob.variables():
         assert v.value() in (0.0, 1.0), 'non-integer variable: {} = {}'.format(v, v.value())
     print('\n')
