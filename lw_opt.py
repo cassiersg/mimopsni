@@ -15,9 +15,18 @@
 # limitations under the License.
 
 """
-Optimize number of refreshes in bitslice implementation of Fantomas
+Optimize number of refreshes in bitslice implementation of lightweight block
+cipher.
+
+Usage: python lw_opt.py <CIPHER>
+
+Ciphers:
+fantomas/f2.txt
+present.txt
+noekeon.txt
 """
 
+import sys
 import logging
 logging.basicConfig(level=logging.INFO)
 
@@ -32,7 +41,7 @@ import graph_tools
 from utils import draw_graph
 
 # like formatted but removes NOT operations
-s = open('fantomas/f2.txt').read()
+s = open(sys.argv[1]).read()
 g = parse.parse(s, tag_output_fn=lambda g, n: n.startswith('y'))
 
 draw_graph(g)
@@ -45,7 +54,7 @@ print('baseline cut', sum(len(x)*(len(x)-1) for x in split_c))
 draw_graph(g)
 plt.show()
 
-cut_edges = opt_sni.opt_sni(g, split_c, max_seconds=10)
+cut_edges = opt_sni.opt_sni(g, split_c, max_seconds=32*3600*10)
 g2 = graph_tools.without_edges(g, cut_edges)
 
 print('Cut is NI', paths_dag.is_graph_NI(g2))
